@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Screening</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="./static/style.css">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #1a1a1a; /* Dark background */
+            background-color: #0093E9;
+background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            background: rgba(24, 20, 20, 0.987); /* Dark semi-transparent background */
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 15px 25px rgba(0,0,0,.6); /* Stronger shadow */
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: #fff;
+        }
+
+        header p {
+            font-size: 14px;
+            color: #bdb8b8;
+        }
+
+        /* Form Styling */
+        .form-container {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        textarea, input {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 16px;
+            color: #fff;
+            border: none;
+            border-bottom: 1px solid #fff;
+            outline: none;
+            background: transparent;
+            transition: .5s;
+        }
+
+        textarea:focus, input:focus {
+            border-bottom-color: #03f40f; /* Green glow */
+        }
+
+        button {
+            width: 100%;
+            padding: 10px 20px;
+            background: transparent;
+            color: #fff;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: .5s;
+            margin-top: 40px;
+            letter-spacing: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            background: #03f40f;
+            color: #fff;
+            box-shadow: 0 0 5px #03f40f,
+                        0 0 25px #03f40f,
+                        0 0 50px #03f40f,
+                        0 0 100px #03f40f;
+        }
+
+        button span {
+            position: absolute;
+            display: block;
+        }
+
+        @keyframes btn-anim1 {
+            0% {
+                left: -100%;
+            }
+
+            50%,100% {
+                left: 100%;
+            }
+        }
+
+        button span:nth-child(1) {
+            bottom: 2px;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #03f40f);
+            animation: btn-anim1 2s linear infinite;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+        #resumes{
+            text-decoration: none;
+            
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌟 Resume Screening 🌟</h1>
+            <p>Upload resumes and provide the job description to find the best match!</p>
+        </header>
+
+        <div class="form-container">
+            <form method="POST" enctype="multipart/form-data">
+                <label for="job_desc"><i class="fas fa-file-alt"></i> Job Description:</label>
+                <textarea name="job_desc" id="job_desc" rows="4" placeholder="Paste the job description here" required></textarea>
+
+                <label for="resumes"><i class="fas fa-upload"></i> Upload Resumes:</label>
+                <input type="file" name="resumes" id="resumes" multiple required>
+
+                <button type="submit"><i class="fas fa-search"></i> Start Screening</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
