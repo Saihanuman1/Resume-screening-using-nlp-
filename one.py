@@ -9,8 +9,16 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
-nlp = spacy.load("en_core_web_sm")
 
+# Load SpaCy model
+try:
+    nlp = spacy.load("en_core_web_sm")
+except:
+    import subprocess
+    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+    nlp = spacy.load("en_core_web_sm")
+
+# Create upload folder if not exists
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
@@ -40,6 +48,7 @@ SKILL_ALIASES = {
     'numpy': ['numpy']
 }
 
+# Extract text from PDF or DOCX
 def extract_text(file_path):
     text = ""
     if file_path.endswith('.pdf'):
@@ -50,9 +59,9 @@ def extract_text(file_path):
                     text += page_text + "\n"
     elif file_path.endswith('.docx'):
         text = docx2txt.process(file_path)
-
     return text.strip().replace('\n', ' ')
 
+# Extract phone number
 def extract_phone(text):
     text = text.replace('\n', ' ').replace('\r', ' ')
     pattern = r'(?:(?:\+91|91|0)?[\s\-]?)?[6-9]\d{9}'
@@ -60,6 +69,7 @@ def extract_phone(text):
     cleaned = [re.sub(r'\D', '', m)[-10:] for m in matches if len(re.sub(r'\D', '', m)) >= 10]
     return ', '.join(set(cleaned)) if cleaned else "N/A"
 
+# Extract skills
 def extract_skills(text):
     text = text.lower()
     found_skills = set()
@@ -70,6 +80,7 @@ def extract_skills(text):
                 break
     return list(found_skills)
 
+# Extract all details
 def extract_details(text):
     return {
         'email': ', '.join(re.findall(r'\S+@\S+', text)) if re.findall(r'\S+@\S+', text) else "N/A",
@@ -77,6 +88,7 @@ def extract_details(text):
         'skills': ', '.join(extract_skills(text)) if extract_skills(text) else "N/A"
     }
 
+# Match score calculator
 def calculate_match_score(resume_skills, job_skills):
     if not resume_skills or not job_skills:
         return 0.0
@@ -85,6 +97,7 @@ def calculate_match_score(resume_skills, job_skills):
     match_count = len(resume_set.intersection(job_set))
     return (match_count / len(job_set)) * 100 if job_set else 0.0
 
+# Delete uploaded files
 def clear_uploaded_files():
     upload_folder = app.config['UPLOAD_FOLDER']
     for filename in os.listdir(upload_folder):
@@ -95,6 +108,7 @@ def clear_uploaded_files():
         except Exception as e:
             print(f"Error deleting file {file_path}: {e}")
 
+# Main route
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -139,5 +153,5 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # Dynamic port for Railway
-    app.run(host='0.0.0.0', port=port)        # Listen on all IPs
+    port = int(os.environ.get("PORT", 5000))  # Railway dynamic port
+    app.run(host='0.0.0.0', port=port)
