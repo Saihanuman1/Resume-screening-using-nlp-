@@ -14,12 +14,31 @@ nlp = spacy.load("en_core_web_sm")
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-# Predefined skill keywords
-SKILL_KEYWORDS = [
-    'python', 'java', 'html', 'css', 'javascript', 'react', 'node',
-    'sql', 'flask', 'aws', 'git', 'linux', 'docker', 'c++', 'c', 'mongodb',
-    'machine learning', 'nlp', 'tensorflow', 'keras', 'pandas', 'numpy'
-]
+# Skill mapping with aliases
+SKILL_ALIASES = {
+    'python': ['python'],
+    'java': ['java'],
+    'html': ['html'],
+    'css': ['css'],
+    'javascript': ['javascript', 'js'],
+    'react': ['react', 'reactjs'],
+    'node': ['node', 'nodejs'],
+    'sql': ['sql'],
+    'flask': ['flask'],
+    'aws': ['aws', 'amazon web services'],
+    'git': ['git'],
+    'linux': ['linux'],
+    'docker': ['docker'],
+    'c++': ['c++'],
+    'c': ['c'],
+    'mongodb': ['mongodb', 'mongo'],
+    'machine learning': ['machine learning', 'ml'],
+    'nlp': ['nlp', 'natural language processing'],
+    'tensorflow': ['tensorflow'],
+    'keras': ['keras'],
+    'pandas': ['pandas'],
+    'numpy': ['numpy']
+}
 
 def extract_text(file_path):
     text = ""
@@ -35,25 +54,20 @@ def extract_text(file_path):
     return text.strip().replace('\n', ' ')
 
 def extract_phone(text):
-    # Normalize text to avoid line breaks interfering with numbers
     text = text.replace('\n', ' ').replace('\r', ' ')
-    
-    # Regex to match common Indian mobile formats
     pattern = r'(?:(?:\+91|91|0)?[\s\-]?)?[6-9]\d{9}'
     matches = re.findall(pattern, text)
-
-    # Clean and format phone numbers
     cleaned = [re.sub(r'\D', '', m)[-10:] for m in matches if len(re.sub(r'\D', '', m)) >= 10]
-
-    # Only return cleaned numbers (this will be shown in the results.html)
     return ', '.join(set(cleaned)) if cleaned else "N/A"
 
 def extract_skills(text):
     text = text.lower()
     found_skills = set()
-    for skill in SKILL_KEYWORDS:
-        if skill.lower() in text:
-            found_skills.add(skill)
+    for main_skill, aliases in SKILL_ALIASES.items():
+        for alias in aliases:
+            if alias in text:
+                found_skills.add(main_skill)
+                break
     return list(found_skills)
 
 def extract_details(text):
@@ -79,7 +93,6 @@ def clear_uploaded_files():
             if os.path.isfile(file_path):
                 os.remove(file_path)
         except Exception as e:
-            # This will now only log errors, not any general information
             print(f"Error deleting file {file_path}: {e}")
 
 @app.route('/', methods=['GET', 'POST'])
@@ -120,11 +133,11 @@ def index():
 
         clear_uploaded_files()
 
-        # Render the results.html page with the results data
         table_html = results.to_html(classes='table table-bordered', index=False)
         return render_template('results.html', table=table_html)
 
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Dynamic port for Railway
+    app.run(host='0.0.0.0', port=port)        # Listen on all IPs
